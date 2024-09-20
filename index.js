@@ -171,6 +171,11 @@ const getUserLungauge = (chatId) => {
 }
 
 const handelStartNewConsultation = (chatId, user) => { 
+    if(user.haveOpenConsultation){
+        bot.sendMessage(chatId, user.language === LANGUAGES.AR ? 'لديك استشارة حالية لا يمكنك بدأ استشارة اخرى حاليا' : "You have open consultation you can't open another one in this time");
+        return
+    }
+    
     bot.sendMessage(chatId, user.language === LANGUAGES.AR ? 'يرجى إرسال صورة لموضع الاصابة .' : "Send an image for the effected part");
 
     bot.once('photo' , async () => {
@@ -188,6 +193,7 @@ const handelStartNewConsultation = (chatId, user) => {
                 try {
                     console.log("Consultation text:", consultationText);
                     bot.sendMessage(chatId, 'تم بدأ الاستشارة الخاصة بك بنجاح سوف يتم الرد عليك من خلال الطبيب المختص في اسرع وقت');
+                    userState[chatId].haveOpenConsultation = true;
                 } catch (error) {
                     bot.sendMessage(chatId, 'There was an error submitting your consultation.');
                 }
